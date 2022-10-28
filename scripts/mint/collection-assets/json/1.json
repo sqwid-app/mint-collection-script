@@ -1,0 +1,39 @@
+{
+  "name": "Your Collection #1",
+  "description": "Remember to replace this description",
+  "image": "ipfs://NewUriToReplace/1.png",
+  "dna": "997d6656c9ab93be5d7174efa717c03927b74cdb",
+  "edition": 1,
+  "date": 1663978917265,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Background"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "NA"
+    },
+    {
+      "trait_type": "Allegiance",
+      "value": "Revenge"
+    },
+    {
+      "trait_type": "Race",
+      "value": "ParrotFish"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "EyePatch"
+    },
+    {
+      "trait_type": "Head",
+      "value": "CaptainHat"
+    },
+    {
+      "trait_type": "Weapon",
+      "value": "Rifle"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

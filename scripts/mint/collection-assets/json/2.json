@@ -1,0 +1,39 @@
+{
+  "name": "Your Collection #2",
+  "description": "Remember to replace this description",
+  "image": "ipfs://NewUriToReplace/2.png",
+  "dna": "997d665fdlafjv898dfahw47b74cdb",
+  "edition": 1,
+  "date": 1663978917265,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Background"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Poison"
+    },
+    {
+      "trait_type": "Allegiance",
+      "value": "Union"
+    },
+    {
+      "trait_type": "Race",
+      "value": "Shell"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Head",
+      "value": "CaptainHat"
+    },
+    {
+      "trait_type": "Weapon",
+      "value": "Sword"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}
