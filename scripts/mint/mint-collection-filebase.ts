@@ -15,13 +15,9 @@ const MINT_ASSETS_IMAGES_DIR = MINT_ASSETS_DIR + "images/";
 const MINT_ASSETS_JSON_DIR = MINT_ASSETS_DIR + "json/";
 export const MINTED_FILE_PATH = MINT_ASSETS_DIR + "mintedIds.json";
 
-const objectManager = new ObjectManager(
-  process.env.S3_KEY,
-  process.env.S3_SECRET,
-  {
-    bucket: process.env.BUCKET_NAME,
-  }
-);
+const objectManager = new ObjectManager(process.env.S3_KEY, process.env.S3_SECRET, {
+  bucket: process.env.BUCKET_NAME
+});
 
 const mkdir = promisify(fs.mkdir);
 const writeFile = promisify(fs.writeFile);
@@ -46,15 +42,13 @@ async function saveUploadMetadata(
     metadata.media = "ipfs://" + ipfsFileData.cid;
     metadata.thumbnail = "ipfs://" + ipfsFileData.cid;
 
-    await writeFile(
-      jsonUploadDirPath + fileNr + ".json",
-      JSON.stringify(metadata)
-    );
+    await writeFile(jsonUploadDirPath + fileNr + ".json", JSON.stringify(metadata));
   } catch (err) {
     console.error("Error in saveUploadMetadata:", err);
     throw err;
   }
 }
+
 
 async function prepareUploadAssets(from: number, to: number) {
   try {
@@ -114,13 +108,10 @@ async function prepareUploadAssets(from: number, to: number) {
 }
 
 // Function to recursively get all files in a directory and its subdirectories
-const getAllFiles = (
-  dirPath: string,
-  arrayOfFiles: string[] = []
-): string[] => {
+const getAllFiles = (dirPath: string, arrayOfFiles: string[] = []): string[] => {
   const files = fs.readdirSync(dirPath);
 
-  files.forEach((file) => {
+  files.forEach(file => {
     const filePath = path.join(dirPath, file);
 
     if (fs.statSync(filePath).isDirectory()) {
@@ -136,45 +127,37 @@ const getAllFiles = (
 };
 
 // Main function to upload all files
-const uploadImages = async (
-  directoryPath: string,
-  ipfsImagesDir: string,
-  jsonUploadDirPath: string,
-  onImageUpload: (
-    fileNr: string,
-    ipfsFileData: { path: string; cid: string }
-  ) => void
-): Promise<boolean> => {
+const uploadImages = async (directoryPath: string, ipfsImagesDir: string, jsonUploadDirPath: string, onImageUpload: (
+  fileNr: string,
+  ipfsFileData: { path: string; cid: string }
+) => void): Promise<boolean> => {
   const files = getAllFiles(directoryPath);
 
   for (const filePath of files) {
     const fileContent = fs.readFileSync(filePath);
     const objectName = path.relative(directoryPath, filePath);
-    const ObjectNameWithoutExtension = objectName.substring(
-      0,
-      objectName.indexOf(".")
-    );
+    const ObjectNameWithoutExtension = objectName.substring(0, objectName.indexOf("."));
 
     try {
       const uploadedObject = await objectManager.upload(
-        objectName, // Object name in Filebase bucket
-        fileContent, // File content (buffer)
-        "", // Metadata (can be customized)
-        {} // Additional options (if needed)
+        objectName,            // Object name in Filebase bucket
+        fileContent,           // File content (buffer)
+        "",                   // Metadata (can be customized)
+        {}                     // Additional options (if needed)
       );
 
       const uploadedObjectDetails = {
         path: filePath,
         cid: uploadedObject.cid.toString(),
-      };
+      }
 
       await writeFile(
         MINT_ASSETS_DIR +
-          ipfsImagesDir +
-          "ipfs-image-" +
-          ObjectNameWithoutExtension +
-          ".json",
-        JSON.stringify(uploadedObjectDetails)
+        ipfsImagesDir +
+        "ipfs-image-" +
+        ObjectNameWithoutExtension +
+        ".json",
+        JSON.stringify(uploadedObjectDetails),
         // function (err: any) {
         //   if (err) throw err;
         //   onImageUpload(ObjectNameWithoutExtension, uploadedObjectDetails);
@@ -192,37 +175,38 @@ const uploadImages = async (
   return true;
 };
 
-async function uploadJSONMetadata(directoryPath: string, ipfsJsonDir: string) {
+async function uploadJSONMetadata(
+  directoryPath: string,
+  ipfsJsonDir: string
+) {
+
   const files = getAllFiles(directoryPath);
 
   for (const filePath of files) {
     const fileContent = fs.readFileSync(filePath);
     const objectName = path.relative(directoryPath, filePath);
-    const ObjectNameWithoutExtension = objectName.substring(
-      0,
-      objectName.indexOf(".")
-    );
+    const ObjectNameWithoutExtension = objectName.substring(0, objectName.indexOf("."));
 
     try {
       const uploadedObject = await objectManager.upload(
-        objectName, // Object name in Filebase bucket
-        fileContent, // File content (buffer)
-        "", // Metadata (can be customized)
-        {} // Additional options (if needed)
+        objectName,            // Object name in Filebase bucket
+        fileContent,           // File content (buffer)
+        "",                   // Metadata (can be customized)
+        {}                     // Additional options (if needed)
       );
 
       const uploadedObjectDetails = {
         path: filePath,
         cid: uploadedObject.cid.toString(),
-      };
+      }
 
       await writeFile(
         MINT_ASSETS_DIR +
-          ipfsJsonDir +
-          "ipfs-json-" +
-          ObjectNameWithoutExtension +
-          ".json",
-        JSON.stringify(uploadedObjectDetails)
+        ipfsJsonDir +
+        "ipfs-json-" +
+        ObjectNameWithoutExtension +
+        ".json",
+        JSON.stringify(uploadedObjectDetails),
         // function (err: any) {
         //   if (err) throw err;
         // }
@@ -233,6 +217,7 @@ async function uploadJSONMetadata(directoryPath: string, ipfsJsonDir: string) {
     }
   }
 }
+
 
 async function uploadAllToIPFS(
   ipfsUploadedMetadataDirPath: string,
@@ -258,12 +243,7 @@ async function uploadAllToIPFS(
     ipfsImagesDir,
     jsonUploadDirPath,
     async (fileNr, ipfsFileData) =>
-      await saveUploadMetadata(
-        MINT_ASSETS_JSON_DIR,
-        fileNr,
-        ipfsFileData,
-        jsonUploadDirPath
-      )
+      await saveUploadMetadata(MINT_ASSETS_JSON_DIR, fileNr, ipfsFileData, jsonUploadDirPath)
   );
 
   if (isImagesUploaded) {
@@ -281,10 +261,10 @@ async function uploadAllToIPFS(
   let minted;
   try {
     minted = JSON.parse(fs.readFileSync(MINTED_FILE_PATH).toString());
-  } catch (e) {}
+  } catch (e) { }
   if (!minted) {
     const isPrepared = await prepareUploadAssets(9, 10);
-    if (isPrepared) {
+    if (isPrepared){
       await uploadAllToIPFS(ipfsUploadedMetadataDirPath, ipfsJsonDir);
     }
   }
